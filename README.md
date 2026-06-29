@@ -15,6 +15,7 @@ A aplicação deve trabalhar com conceitos como eventos, participantes, inscriç
 5. A credencial é validada no momento de acesso ao evento.
 6. A tentativa de acesso é registrada.
 
+```mermaid
 flowchart LR
     A[Evento é cadastrado] --> B[Pessoa é inscrita ou convidada]
     B --> C[Aplicação envia confirmação por e-mail]
@@ -29,6 +30,7 @@ flowchart LR
     H --> I
 
     I --> J[Histórico de acesso disponível]
+```
 
 Esses conceitos ainda podem evoluir conforme a modelagem avançar, mas servem como base para orientar as próximas decisões.
 
