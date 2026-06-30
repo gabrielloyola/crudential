@@ -128,4 +128,58 @@ RSpec.describe "Api::V1::Events", type: :request do
       end
     end
   end
+
+  describe "POST /api/v1/events" do
+    subject(:perform_request) { post api_v1_events_path, params: params }
+
+    let(:params) do
+      {
+        event: {
+          name: "Ruby Summit",
+          description: "A conference for Rubyists.",
+          starts_at: "2026-07-10T10:00:00Z",
+          ends_at: "2026-07-10T18:00:00Z",
+          capacity: 120,
+          status: "published",
+          user_id: user.id
+        }
+      }
+    end
+    let(:user) { create(:user) }
+
+    it "creates an event" do
+      expect { perform_request }.to change(Event, :count).by(1)
+      expect(response).to have_http_status(:created)
+      expect(response.parsed_body).to include(
+        "name" => "Ruby Summit",
+        "description" => "A conference for Rubyists.",
+        "status" => "published",
+        "user_id" => user.id
+      )
+    end
+
+    context "when params are invalid" do
+      let(:params) do
+        {
+          event: {
+            name: "",
+            starts_at: "2026-07-10T10:00:00Z",
+            ends_at: "2026-07-10T10:00:00Z",
+            capacity: 0,
+            user_id: user.id
+          }
+        }
+      end
+
+      it "rejects the request" do
+        expect { perform_request }.not_to change(Event, :count)
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.parsed_body["errors"]).to include(
+          "name" => [ "can't be blank" ],
+          "capacity" => [ "must be greater than 0" ],
+          "ends_at" => [ "must be after starts at" ]
+        )
+      end
+    end
+  end
 end
