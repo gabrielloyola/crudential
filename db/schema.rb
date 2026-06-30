@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_30_005842) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_30_010537) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -36,6 +36,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_30_005842) do
     t.index ["document_number"], name: "index_participants_on_document_number", unique: true
   end
 
+  create_table "registrations", force: :cascade do |t|
+    t.datetime "confirmed_at"
+    t.datetime "created_at", null: false
+    t.bigint "event_id", null: false
+    t.bigint "participant_id", null: false
+    t.string "status", default: "pending", null: false
+    t.datetime "updated_at", null: false
+    t.index ["event_id", "participant_id"], name: "index_registrations_on_event_id_and_participant_id", unique: true
+    t.index ["event_id"], name: "index_registrations_on_event_id"
+    t.index ["participant_id"], name: "index_registrations_on_participant_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", null: false
@@ -47,4 +59,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_30_005842) do
   end
 
   add_foreign_key "events", "users"
+  add_foreign_key "registrations", "events"
+  add_foreign_key "registrations", "participants"
 end
