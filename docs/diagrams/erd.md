@@ -19,7 +19,7 @@ erDiagram
 
     EVENTS {
         bigint id PK
-        bigint admin_user_id FK
+        bigint user_id FK
         string name
         text description
         datetime starts_at
