@@ -19,7 +19,7 @@ erDiagram
 
     EVENTS {
         bigint id PK
-        bigint admin_user_id FK
+        bigint user_id FK
         string name
         text description
         datetime starts_at
@@ -52,9 +52,6 @@ erDiagram
     CREDENTIALS {
         bigint id PK
         bigint registration_id FK
-        string code UK
-        string token_digest
-        string kind
         string status
         datetime issued_at
         datetime expires_at

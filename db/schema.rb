@@ -1,0 +1,88 @@
+# This file is auto-generated from the current state of the database. Instead
+# of editing this file, please use the migrations feature of Active Record to
+# incrementally modify your database, and then regenerate this schema definition.
+#
+# This file is the source Rails uses to define your schema when running `bin/rails
+# db:schema:load`. When creating a new database, `bin/rails db:schema:load` tends to
+# be faster and is potentially less error prone than running all of your
+# migrations from scratch. Old migrations may fail to apply correctly if those
+# migrations use external dependencies or application code.
+#
+# It's strongly recommended that you check this file into your version control system.
+
+ActiveRecord::Schema[8.1].define(version: 2026_06_30_012309) do
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "pg_catalog.plpgsql"
+
+  create_table "access_logs", force: :cascade do |t|
+    t.datetime "attempted_at", null: false
+    t.datetime "created_at", null: false
+    t.bigint "credential_id", null: false
+    t.bigint "registration_id", null: false
+    t.string "result", default: "denied", null: false
+    t.datetime "updated_at", null: false
+    t.index ["credential_id"], name: "index_access_logs_on_credential_id"
+    t.index ["registration_id"], name: "index_access_logs_on_registration_id"
+  end
+
+  create_table "credentials", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "expires_at", null: false
+    t.datetime "issued_at", null: false
+    t.bigint "registration_id", null: false
+    t.string "status", default: "active", null: false
+    t.datetime "updated_at", null: false
+    t.index ["registration_id"], name: "index_credentials_on_registration_id", unique: true
+  end
+
+  create_table "events", force: :cascade do |t|
+    t.integer "capacity", null: false
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.datetime "ends_at", null: false
+    t.string "name", null: false
+    t.datetime "starts_at", null: false
+    t.string "status", default: "draft", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_events_on_user_id"
+  end
+
+  create_table "participants", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "document_number", null: false
+    t.string "email", null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["document_number"], name: "index_participants_on_document_number", unique: true
+  end
+
+  create_table "registrations", force: :cascade do |t|
+    t.datetime "confirmed_at"
+    t.datetime "created_at", null: false
+    t.bigint "event_id", null: false
+    t.bigint "participant_id", null: false
+    t.string "status", default: "pending", null: false
+    t.datetime "updated_at", null: false
+    t.index ["event_id", "participant_id"], name: "index_registrations_on_event_id_and_participant_id", unique: true
+    t.index ["event_id"], name: "index_registrations_on_event_id"
+    t.index ["participant_id"], name: "index_registrations_on_participant_id"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email", null: false
+    t.string "name", null: false
+    t.string "password_digest", null: false
+    t.string "role", default: "staff", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_users_on_email", unique: true
+  end
+
+  add_foreign_key "access_logs", "credentials"
+  add_foreign_key "access_logs", "registrations"
+  add_foreign_key "credentials", "registrations"
+  add_foreign_key "events", "users"
+  add_foreign_key "registrations", "events"
+  add_foreign_key "registrations", "participants"
+end
