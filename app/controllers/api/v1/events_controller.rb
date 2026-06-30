@@ -41,6 +41,16 @@ module Api
         end
       end
 
+      def destroy
+        result = ::Events::Destroy.call(params.permit(:id))
+
+        if result.success?
+          head :no_content
+        else
+          render json: { errors: result.errors }, status: destroy_failure_status(result)
+        end
+      end
+
       private
 
       def filter_params
@@ -55,6 +65,12 @@ module Api
         return :not_found if result.errors.key?(:id)
 
         :unprocessable_content
+      end
+
+      def destroy_failure_status(result)
+        return :not_found if result.errors.key?(:id)
+
+        :conflict
       end
     end
   end

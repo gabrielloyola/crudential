@@ -247,4 +247,47 @@ RSpec.describe "Api::V1::Events", type: :request do
       end
     end
   end
+
+  describe "DELETE /api/v1/events/:id" do
+    subject(:perform_request) { delete api_v1_event_path(id) }
+
+    let(:id) { event.id }
+    let!(:event) { create(:event) }
+
+    it "destroys the event" do
+      expect { perform_request }.to change(Event, :count).by(-1)
+      expect(response).to have_http_status(:no_content)
+      expect(response.body).to be_blank
+    end
+
+    context "when the event does not exist" do
+      let(:id) { 999_999 }
+
+      it "returns not found" do
+        expect { perform_request }.not_to change(Event, :count)
+        expect(response).to have_http_status(:not_found)
+        expect(response.parsed_body).to eq(
+          "errors" => {
+            "id" => [ "not found" ]
+          }
+        )
+      end
+    end
+
+    context "when the event has registrations" do
+      before do
+        create(:registration, event: event)
+      end
+
+      it "returns conflict" do
+        expect { perform_request }.not_to change(Event, :count)
+        expect(response).to have_http_status(:conflict)
+        expect(response.parsed_body).to eq(
+          "errors" => {
+            "base" => [ "cannot delete event with registrations" ]
+          }
+        )
+      end
+    end
+  end
 end
