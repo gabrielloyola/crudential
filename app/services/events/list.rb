@@ -6,9 +6,9 @@ module Events
       ends_at = parse_datetime(:ends_at)
       validate_date_range(starts_at, ends_at)
 
-      return Result.new(events: Event.none, errors: errors) if errors.any?
+      return Result.new(data: { events: Event.none }, errors: errors) if errors.any?
 
-      Result.new(events: filtered_events(starts_at, ends_at), errors: {})
+      Result.new(data: { events: filtered_events(starts_at, ends_at) })
     end
 
     private

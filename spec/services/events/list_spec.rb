@@ -11,7 +11,7 @@ RSpec.describe Events::List, type: :service do
       earlier_event
 
       expect(result).to be_success
-      expect(result.events).to eq([ earlier_event, later_event ])
+      expect(result.data.events).to eq([ earlier_event, later_event ])
       expect(result.errors).to eq({})
     end
 
@@ -29,7 +29,7 @@ RSpec.describe Events::List, type: :service do
 
       it "filters events by status" do
         expect(result).to be_success
-        expect(result.events).to eq([ published_event ])
+        expect(result.data.events).to eq([ published_event ])
       end
     end
 
@@ -52,7 +52,7 @@ RSpec.describe Events::List, type: :service do
 
       it "filters events by the provided datetime range" do
         expect(result).to be_success
-        expect(result.events).to eq([ inside_event ])
+        expect(result.data.events).to eq([ inside_event ])
       end
     end
 
@@ -61,7 +61,7 @@ RSpec.describe Events::List, type: :service do
 
       it "returns errors" do
         expect(result).not_to be_success
-        expect(result.events).to be_none
+        expect(result.data.events).to be_none
         expect(result.errors).to eq(status: [ "is not included in the list" ])
       end
     end
@@ -76,7 +76,7 @@ RSpec.describe Events::List, type: :service do
 
       it "returns errors" do
         expect(result).not_to be_success
-        expect(result.events).to be_none
+        expect(result.data.events).to be_none
         expect(result.errors).to eq(ends_at: [ "must be after starts at" ])
       end
     end
@@ -86,7 +86,7 @@ RSpec.describe Events::List, type: :service do
 
       it "returns errors" do
         expect(result).not_to be_success
-        expect(result.events).to be_none
+        expect(result.data.events).to be_none
         expect(result.errors).to eq(starts_at: [ "is invalid" ])
       end
     end

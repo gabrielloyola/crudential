@@ -95,4 +95,37 @@ RSpec.describe "Api::V1::Events", type: :request do
       end
     end
   end
+
+  describe "GET /api/v1/events/:id" do
+    subject(:perform_request) { get api_v1_event_path(id) }
+
+    let(:id) { event.id }
+    let(:event) { create(:event) }
+
+    it "returns the event" do
+      perform_request
+
+      expect(response).to have_http_status(:ok)
+      expect(response.parsed_body).to include(
+        "id" => event.id,
+        "name" => event.name,
+        "status" => event.status
+      )
+    end
+
+    context "when the event does not exist" do
+      let(:id) { 999_999 }
+
+      it "returns not found" do
+        perform_request
+
+        expect(response).to have_http_status(:not_found)
+        expect(response.parsed_body).to eq(
+          "errors" => {
+            "id" => [ "not found" ]
+          }
+        )
+      end
+    end
+  end
 end

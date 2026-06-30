@@ -1,14 +1,4 @@
 class ApplicationService
-  Result = Data.define(:events, :errors) do
-    def success?
-      errors.empty?
-    end
-
-    def failure?
-      errors.present?
-    end
-  end
-
   def self.call(params = {})
     new(params).call
   end
