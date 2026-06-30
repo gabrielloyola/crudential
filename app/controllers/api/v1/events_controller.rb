@@ -31,6 +31,16 @@ module Api
         end
       end
 
+      def update
+        result = ::Events::Update.call(event_params.merge(id: params[:id]))
+
+        if result.success?
+          render json: result.data.event
+        else
+          render json: { errors: result.errors }, status: update_failure_status(result)
+        end
+      end
+
       private
 
       def filter_params
@@ -39,6 +49,12 @@ module Api
 
       def event_params
         params.expect(event: [ :name, :description, :starts_at, :ends_at, :capacity, :status, :user_id ])
+      end
+
+      def update_failure_status(result)
+        return :not_found if result.errors.key?(:id)
+
+        :unprocessable_content
       end
     end
   end

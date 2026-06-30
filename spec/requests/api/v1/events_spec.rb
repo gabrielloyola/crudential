@@ -182,4 +182,69 @@ RSpec.describe "Api::V1::Events", type: :request do
       end
     end
   end
+
+  describe "PATCH /api/v1/events/:id" do
+    subject(:perform_request) { patch api_v1_event_path(id), params: params }
+
+    let(:id) { event.id }
+    let(:event) { create(:event, name: "Ruby Summit", status: "draft") }
+    let(:params) do
+      {
+        event: {
+          name: "Updated Ruby Summit",
+          description: "Updated description.",
+          status: "published"
+        }
+      }
+    end
+
+    it "updates the event" do
+      perform_request
+
+      expect(response).to have_http_status(:ok)
+      expect(response.parsed_body).to include(
+        "id" => event.id,
+        "name" => "Updated Ruby Summit",
+        "description" => "Updated description.",
+        "status" => "published"
+      )
+    end
+
+    context "when the event does not exist" do
+      let(:id) { 999_999 }
+
+      it "returns not found" do
+        perform_request
+
+        expect(response).to have_http_status(:not_found)
+        expect(response.parsed_body).to eq(
+          "errors" => {
+            "id" => [ "not found" ]
+          }
+        )
+      end
+    end
+
+    context "when params are invalid" do
+      let(:params) do
+        {
+          event: {
+            starts_at: "2026-07-10T10:00:00Z",
+            ends_at: "2026-07-10T10:00:00Z",
+            capacity: 0
+          }
+        }
+      end
+
+      it "rejects the request" do
+        perform_request
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.parsed_body["errors"]).to include(
+          "capacity" => [ "must be greater than 0" ],
+          "ends_at" => [ "must be after starts at" ]
+        )
+      end
+    end
+  end
 end
