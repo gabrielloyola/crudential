@@ -52,9 +52,6 @@ erDiagram
     CREDENTIALS {
         bigint id PK
         bigint registration_id FK
-        string code UK
-        string token_digest
-        string kind
         string status
         datetime issued_at
         datetime expires_at
