@@ -40,7 +40,21 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    # services:
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: crudential
+          POSTGRES_PASSWORD: crudential
+          POSTGRES_DB: crudential_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U crudential -d crudential_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     #  redis:
     #    image: redis
     #    ports:
@@ -62,5 +76,8 @@ jobs:
       - name: Run tests
         env:
           RAILS_ENV: test
+          TEST_DATABASE_URL: postgres://crudential:crudential@localhost:5432/crudential_test
           # REDIS_URL: redis://localhost:6379/0
-        run: bin/rails db:test:prepare test
+        run: |
+          bin/rails db:test:prepare
+          bundle exec rspec
